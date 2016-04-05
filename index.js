@@ -5,6 +5,7 @@ var cookieSession = require('cookie-session')
 var passport = require('passport')
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var util = require('util');
+var gcal = require('google-calendar');
 
 var app = express();
 
