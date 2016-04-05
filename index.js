@@ -21,7 +21,7 @@ var config = require('./config');
 passport.use(new GoogleStrategy({
     clientID: config.consumer_key,
     clientSecret: config.consumer_secret,
-    callbackURL: "http://localhost:8082/auth/callback",
+    callbackURL: "http://caladvice.herokuapp.com/auth/callback",
     scope: ['openid', 'email', 'https://www.googleapis.com/auth/calendar']
   },
   function(accessToken, refreshToken, profile, done) {
