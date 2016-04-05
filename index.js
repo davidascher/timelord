@@ -6,14 +6,12 @@ var util = require('util');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
+app.use(express.cookieParser());
+app.use(express.bodyParser());
+app.use(express.session({ secret: 'keyboard cat' }));
+app.use(passport.initialize());
 
 app.use(express.static(__dirname + '/public'));
-app.configure(function() {
-  app.use(express.cookieParser());
-  app.use(express.bodyParser());
-  app.use(express.session({ secret: 'keyboard cat' }));
-  app.use(passport.initialize());
-});
 
 var config = require('./config');
 
