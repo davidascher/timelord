@@ -1,4 +1,5 @@
 var express = require('express');
+var moment = require('moment');
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var cookieSession = require('cookie-session')
@@ -18,11 +19,18 @@ app.use(passport.initialize());
 app.use(express.static(__dirname + '/public'));
 
 var config = require('./config');
+var callbackURL;
+
+if (config.node_env == "PRODUCTION") {
+  callbackURL = "https://caladvisor.herokuapp.com/auth/callback";
+} else {
+  callbackURL = "http://localhost:5000/auth/callback";
+}
 
 passport.use(new GoogleStrategy({
     clientID: config.consumer_key,
     clientSecret: config.consumer_secret,
-    callbackURL: "https://caladvice.herokuapp.com/auth/callback",
+    callbackURL: callbackURL,
     scope: ['openid', 'email', 'https://www.googleapis.com/auth/calendar']
   },
   function(accessToken, refreshToken, profile, done) {
@@ -41,17 +49,36 @@ app.get('/auth/callback',
     res.redirect('/');
   });
 
+app.all('/welcome', function(req, res){
+  // show a welcome screen, and get the user to authorize
+  return res.redirect('/auth');
+});
+
 app.all('/', function(req, res){
 
-  if(!req.session.access_token) return res.redirect('/auth');
+  if(!req.session.access_token) {
+    return res.redirect('/welcome');
+  }
+
+  // We're logged in.  We show the calendar list and ask them to pick one
+  // Actually, for now we'll just look at the 'primary calendar'
 
   //Create an instance from accessToken
   var accessToken = req.session.access_token;
 
-  gcal(accessToken).calendarList.list(function(err, data) {
+  gcal(accessToken).events.list('primary',
+    {'timeMax': moment().format(),
+     'timeMin': moment().subtract('1', 'week').format()
+    }, function(err, data) {
     if(err) return res.send(500,err);
+    res.setHeader('Content-Type', 'application/json');
     return res.send(data);
   });
+
+  // gcal(accessToken).calendarList.list(function(err, data) {
+  //   if(err) return res.send(500,err);
+  //   return res.send(data);
+  // });
 });
 
 app.all('/:calendarId', function(req, res){
