@@ -1,4 +1,7 @@
 var express = require('express');
+var cookieParser = require('cookie-parser')
+var bodyParser = require('body-parser')
+var cookieSession = require('cookie-session')
 var passport = require('passport')
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var util = require('util');
@@ -6,9 +9,9 @@ var util = require('util');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
-app.use(express.cookieParser());
-app.use(express.bodyParser());
-app.use(express.session({ secret: 'keyboard cat' }));
+app.use(cookieParser());
+app.use(bodyParser());
+app.use(cookieSession({ secret: 'blah cat' }));
 app.use(passport.initialize());
 
 app.use(express.static(__dirname + '/public'));
