@@ -15,6 +15,8 @@ app.configure(function() {
   app.use(passport.initialize());
 });
 
+var config = require('./config');
+
 passport.use(new GoogleStrategy({
     clientID: config.consumer_key,
     clientSecret: config.consumer_secret,
